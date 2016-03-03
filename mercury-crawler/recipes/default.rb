@@ -3,7 +3,7 @@ include_recipe 'supervisor'
 
 app = search(:aws_opsworks_app).first
 
-if app['shortname'] != 'python'
+if app['shortname'] != 'doubanMovie'
     Chef::Log.debug("Skipping mercury-crawler::default for application #{app['shortname']} as it is not a python app")
     return
 end
