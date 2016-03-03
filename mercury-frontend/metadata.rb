@@ -1,0 +1,7 @@
+name             'mercury-frontend'
+maintainer       'stonemary'
+maintainer_email 'stonary.henary@gmail.com'
+license          'MIT'
+description      'Installs/Configures mercury-frontend'
+long_description 'Installs/Configures mercury-frontend'
+version          '0.1.0'
