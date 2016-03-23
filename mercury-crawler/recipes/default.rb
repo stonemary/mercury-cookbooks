@@ -22,6 +22,3 @@ directory '/opt/mercury/env/' do
   mode '0755'
   action :create
 end
-
-
-
