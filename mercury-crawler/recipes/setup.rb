@@ -11,14 +11,23 @@ include_recipe 'supervisor'
 
 include_recipe 'mercury-crawler::default'
 
-app = search("aws_opsworks_app").first
+app = nil
+
+search("aws_opsworks_app").each do |result|
+  if result['shortname'] != node['mercury-crawler']['app_name']
+    Chef::Log.info("Skipping application #{result['shortname']} as it is not the app #{node['mercury-crawler']['app_name']}")
+  else
+    app = result
+    break
+  end
+end
+
+if app.nil?
+  Chef::Log.info("Skipping mercury::crawler as there is no app #{node['mercury-crawler']['app_name']}")
+  return
+end
 
 Chef::Log.info("application #{app['shortname']}")
-
-if app['shortname'] != 'doubanmovie'
-    Chef::Log.info("Skipping mercury-crawler::default for application #{app['shortname']} as it is not a python app")
-    return
-end
 
 sys_path = "/opt/mercury"
 app_path = "#{sys_path}/#{app['shortname']}"
@@ -50,15 +59,15 @@ python_virtualenv env_path do
 end
 
 execute 'pip install requirements' do
-  command                    "source #{env_path}/bin/activate; pip install -r #{app_path}/doubanMovie/requirements.txt"
+  command                    "source #{env_path}/bin/activate; pip install -r #{app_path}/doubanMovieUpdate/requirements.txt"
   group                      'mercury'
   user                       'mercury'
-  action                     :nothing
 end
 
 supervisor_service app['shortname'] do
   user "root"
   action [:enable, :start]
   autostart true
-  command "#{env_path}/bin/python #{app_path}/application.py"
+  directory "#{app_path}/doubanMovieUpdate/"
+  command "#{env_path}/bin/python #{app_path}/doubanMovieUpdate/application.py"
 end
